@@ -26,6 +26,7 @@ Options
   --port PORT                 Port of MongoDB service (default: 27017)
   --post_db POST_DB           Post database name of MongoDB service (default: post)
   --comments_db COMMENTS_DB   Comment database name of MongoDB service (default: comment)
+  --rich                      Comments have more information (default: False)
   --update_days UPDATE_DAYS   Amount of days old a post must be, to not try to search for new comments (default: 2)
   --loop, -l                  Search and update periodically (default: False)
   --wait_time WAIT_TIME       Hours to wait between iterations of the loop (default: 2)

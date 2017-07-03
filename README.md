@@ -2,12 +2,21 @@ TFG-ep3p
 ========
 
 Instagram monitoring system
+---------------------------
 
 This is a final project for a Computer Science degree. It's a monitoring system for Instagram whose purpose is to scrape Instagram posts of public celebrities, or asociated to a hashtag, with their comments.
 
-This project needs a running MongoDB database where to save data.
+This project needs a running MongoDB database where to save data, and uses the library [instagram_private_api](https://github.com/ping/instagram_private_api), and has other dependencies, please open setup.py until this project is properly packaged.
+
+
+Usage
+-----
+```bash
+$ python -m instagram_monitor    
+```
 
 Options
+-------
 ```
   -h, --help                  show this help message and exit
   --queries QUERIES           Path to a file containing users and hashtags to scrape (default: queries.txt)

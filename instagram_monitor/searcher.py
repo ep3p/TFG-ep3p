@@ -314,8 +314,8 @@ class InstagramSearcher(object):
                     comments = []
 
                 list_posts.append({'post': post, 'comments': comments})
-                logging.info('Post {:>5}: {:>5} comments.'.format(
-                    enum_id[0]+1, len(comments)))
+                logging.info('Post {:>5}: {:>5} from {:>5} comments.'.format(
+                    enum_id[0]+1, post['comments']['count'], len(comments)))
 
             except api.ClientError as e:
                 logging.error('Post {:>5}: {} {}.'.format(

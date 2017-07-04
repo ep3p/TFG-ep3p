@@ -263,11 +263,12 @@ class InstagramMonitor(object):
                 graph.add_edge(text['username'], user)
             if op_mentioned and 'op' in text:
                 graph.add_edge(text['username'], text['op'])
-        logging.info( 'Created \'{}\' graph:'.format(query))
-        logging.info( '{:>8} nodes.'.format(graph.order()))
-        logging.info( '{:>8} edges.'.format(graph.size()))
-
+        
         path = Path('graphs/')
         path.mkdir(parents = True, exist_ok = True)
         networkx.drawing.nx_pydot.write_dot(graph,
             ''.join(['graphs/', query, '-', str(int(time.time())), '.dot']))
+        
+        logging.info( 'Created \'{}\' graph:'.format(query))
+        logging.info( '{:>8} nodes.'.format(graph.order()))
+        logging.info( '{:>8} edges.'.format(graph.size()))

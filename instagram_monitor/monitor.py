@@ -278,12 +278,11 @@ class InstagramMonitor(object):
         logging.info( '{:>8} nodes.'.format(graph.order()))
         logging.info( '{:>8} edges.'.format(graph.size()))
 
-    def export_info_query(self, query, op_mentioned=False):
-        """Saves in a file all comments from a query collection.
+    def export_info_query(self, query):
+        """Saves in a file general information from a query collection.
 
-        Saves two files, one for comments, another for captions, each line
-        of a file has a comment or caption with the next format:
-        post_id \t username \t text_id \t text
+        Saves two files, one about post, comments and likes information, 
+        and another is a plot of the number of posts per day of the query.
 
         Args:
             query (str): The name of the collection.

@@ -70,7 +70,7 @@ def main():
     parser.add_argument('--quiet', '-q', default=False, action='store_true',
                         help='No logging info')
     parser.add_argument('--verbose', default='INFO',
-                        help=('Logging verbosity level.'
+                        help=('Logging verbosity level. '
                               'Options: DEBUG INFO WARNING ERROR CRITICAL'))
 
     args = parser.parse_args()

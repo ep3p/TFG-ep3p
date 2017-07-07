@@ -35,7 +35,7 @@ def main():
     parser.add_argument('--rich',
                         default=False, action='store_true',
                         help=('Comments have more information'))
-                        
+
     parser.add_argument('--update_days', type=int, default=2,
                         help=('Amount of days old a post must be, to not try '
                               'to search for new comments'))
@@ -48,21 +48,24 @@ def main():
     parser.add_argument('--wait_time', type=int, default=2,
                         help=('Hours to wait between iterations of the loop'))
 
-                        
+
     parser.add_argument('--search', '-s',
                         default=False, action='store_true',
                         help=('Search new posts from queries'))
     parser.add_argument('--update', '-u',
                         default=False, action='store_true',
                         help=('Update posts from queries'))
-                        
-                        
+
+
     parser.add_argument('--export_comments', '-c',
                         default=False, action='store_true',
                         help=('Export post texts to a file.'))
     parser.add_argument('--export_graphs', '-g',
                         default=False, action='store_true',
                         help=('Export mentions graph to a file.'))
+    parser.add_argument('--export_info', '-i',
+                        default=False, action='store_true',
+                        help=('Export general information of each query to a file.'))
 
     parser.add_argument('--quiet', '-q', default=False, action='store_true',
                         help='No logging info')
@@ -104,7 +107,9 @@ def main():
                 tasks.append(monitor.export_comments_query)
             if args.export_graphs:
                 tasks.append(monitor.export_graph_query)
-            
+            if args.export_info:
+                tasks.append(monitor.export_info_query)
+
             if not tasks:
                 tasks = [monitor.search_query,
                          monitor.update_query]
@@ -112,10 +117,10 @@ def main():
             for task in tasks:
                 for query in queries:
                     task(query)
-            
+
             if not args.loop:
                 break
-            
+
             logging.info('Waiting {} hours.'.format(args.wait_time))
             prev = time.time()
             while True:

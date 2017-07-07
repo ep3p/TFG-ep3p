@@ -1,5 +1,10 @@
+from collections                       import Counter
+from datetime                          import date
 from instagram_monitor.mongo_frontend  import MongoFrontEnd
 from instagram_monitor.searcher        import InstagramSearcher as Searcher
+from matplotlib                        import pyplot            as plt
+from matplotlib                        import dates             as md
+from matplotlib.dates                  import MO, TU, WE, TH, FR, SA, SU
 from pathlib                           import Path
 import logging
 import networkx
@@ -9,9 +14,9 @@ import time
 
 class InstagramMonitor(object):
 
-    def __init__(self, username=None, password=None, 
+    def __init__(self, username=None, password=None,
                  host='localhost', port=27017,
-                 post_db='post', comments_db='comment', 
+                 post_db='post', comments_db='comment',
                  rich_comments=False, update_days=2):
         """
 
@@ -26,7 +31,7 @@ class InstagramMonitor(object):
                 to search for new comments.
 
         """
-        self.searcher    = Searcher(username, password, 
+        self.searcher    = Searcher(username, password,
                                     rich_comments=rich_comments)
         self.host        = host
         self.port        = port
@@ -49,7 +54,7 @@ class InstagramMonitor(object):
         """
         if len(posts):
             logging.info('Saving posts: {}'.format(len(posts)))
-            
+
             ago_sec = time.time() - Searcher.daytosec(self.update_days)
             for post in posts:
                 created_time = int(post['post']['created_time'])
@@ -70,7 +75,7 @@ class InstagramMonitor(object):
                     self.mongo.save_one_by_one(post['comments'])
                     self.mongo.join_collections(post_id, post_id,
                                                 comm_entry, self.comm_db)
-                                                
+
             logging.info('Saving completed.')
 
     def search_query(self, query):
@@ -133,7 +138,7 @@ class InstagramMonitor(object):
                     {'id': {'$in': not_uped_ids}},
                     {'$set': {'archived': True, 'not_found': True}})
                 self.__save_query(query, uped_posts)
-        
+
         logging.info(('Updated  \'{}\'.').format(query, older_days))
 
     def migrate_query(self, query, migrate_db):
@@ -263,12 +268,71 @@ class InstagramMonitor(object):
                 graph.add_edge(text['username'], user)
             if op_mentioned and 'op' in text:
                 graph.add_edge(text['username'], text['op'])
-        
+
         path = Path('graphs/')
         path.mkdir(parents = True, exist_ok = True)
         networkx.drawing.nx_pydot.write_dot(graph,
             ''.join(['graphs/', query, '-', str(int(time.time())), '.dot']))
-        
+
         logging.info( 'Created \'{}\' graph:'.format(query))
         logging.info( '{:>8} nodes.'.format(graph.order()))
         logging.info( '{:>8} edges.'.format(graph.size()))
+
+    def export_info_query(self, query, op_mentioned=False):
+        """Saves in a file all comments from a query collection.
+
+        Saves two files, one for comments, another for captions, each line
+        of a file has a comment or caption with the next format:
+        post_id \t username \t text_id \t text
+
+        Args:
+            query (str): The name of the collection.
+
+        """
+        logging.info(('Saving general information from '
+                      'query \'{}\' to a file.').format(query) )
+
+        pathinfo = Path(''.join(['exported_info/', query, '/',
+                                 query, '_info.txt']))
+        pathinfo.parent.mkdir(parents = True, exist_ok = True)
+        with pathinfo.open( 'w+', encoding = 'utf8' ) as file_comm:
+            self.mongo.change_db(self.post_db, query)
+            posts = self.mongo.find({},
+                                    {'id': 1, 'created_time': 1,
+                                     'comments': 1, 'likes': 1})
+            total_posts = posts.count()
+            total_comms = 0
+            total_likes = 0
+            post_dates = Counter()
+            for post in posts:
+                post_dates.update(
+                    [date.fromtimestamp(int(post['created_time']))])
+                total_comms += post['comments']['count']
+                total_likes += post['likes']['count']
+            result = ('{:<20} {:>10.3f}\n'*3).format(
+                'Total posts:', total_posts,
+                'Average likes:', total_likes/total_posts,
+                'Average comments:', total_comms/total_posts)
+            file_comm.write(result)
+            x, y = zip(*sorted(post_dates.items()))
+            fig, ax = plt.subplots()
+            ax.plot_date(x, y, fmt='r-')
+            days = md.DayLocator()
+            mons = md.WeekdayLocator(byweekday=MO)
+            monsFmt = md.DateFormatter('%Y-%m-%d')
+            ax.xaxis.set_minor_locator(days)
+            ax.xaxis.set_major_locator(mons)
+            ax.xaxis.set_major_formatter(monsFmt)
+            ax.set_xlim([date(2017, 6, 7), date(2017, 7, 4)])
+            ax.format_xdata = md.DateFormatter('%Y-%m-%d')
+
+            ax.grid(True)
+            fig.autofmt_xdate()
+            plt.suptitle(query + ' posts per day',
+                         size=20, family='serif')
+            plt.savefig(
+                ''.join(['exported_info/', query, '/',
+                         query, '_post_dates.png']),
+                bbox_inches='tight')
+            plt.close()
+            logging.info('Saved general information.')

@@ -34,6 +34,7 @@ Options
   --update, -u                Update posts from queries (default: False)
   --export_comments, -c       Export post texts to a file. (default: False)
   --export_graphs, -g         Export mentions graph to a file. (default: False)
+  --export_info, -i           Export general information of the collections to a file. (default: False)  
   --quiet, -q                 No logging info (default: False)
   --verbose VERBOSE           Logging verbosity level.Options: DEBUG INFO WARNING ERROR CRITICAL (default: INFO)
 ```

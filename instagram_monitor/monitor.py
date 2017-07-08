@@ -322,7 +322,7 @@ class InstagramMonitor(object):
             ax.xaxis.set_minor_locator(days)
             ax.xaxis.set_major_locator(mons)
             ax.xaxis.set_major_formatter(monsFmt)
-            ax.set_xlim([date(2017, 6, 7), date(2017, 7, 4)])
+            #ax.set_xlim([date(2017, 6, 7), date(2017, 7, 4)])
             ax.format_xdata = md.DateFormatter('%Y-%m-%d')
 
             ax.grid(True)

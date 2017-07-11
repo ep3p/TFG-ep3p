@@ -6,18 +6,12 @@ import logging
 '''
 Code inspired by the book " Mining the Social Web, Matthew A. Russell - 2nd Edition."
 It is used to save and/or retreive tweets in a MongoDb database.
+
+Code lent by Lluis Hurtado.
 '''
-
-
-#date_str = "Sat Nov 07 22:40:58 +0010 2015"
-#d = datetime.strptime(date_str,'%a %b %d %H:%M:%S %z %Y')
-#print (d.strftime('%Y-%m-%d-%H'))
-
 
 def datestr_to_date(datestr):
     return datetime.datetime.strptime(datestr,'%a %b %d %H:%M:%S %z %Y')
-
-
 
 class MongoFrontEnd:
 
@@ -25,7 +19,6 @@ class MongoFrontEnd:
     _active_DB = "mulan-active"
     _extra_DB = "mulan-extra"
     _catalog_DB = "mulan-catalog"
-
 
     def __init__(self, host, port, db=None, coll=None, username=None, password=None):
         if username and password:
@@ -37,7 +30,6 @@ class MongoFrontEnd:
 
         if db != None:
             self.change_db(db, coll)
-
 
     def change_db(self, db, coll=None):
         # Get a reference to a particular database
@@ -54,7 +46,6 @@ class MongoFrontEnd:
         return r
 
     def save_one_by_one(self, data):
-        #logging.info('saving...{}'.format(len(data)))
         for item in data:
             self.save_json(item)
 
@@ -92,24 +83,14 @@ class MongoFrontEnd:
             max_atr = res_max[atr]
         return (min_atr, max_atr)
 
-
     def get_info_limits(self, atr='id'):
         return self.__collection.find_one(sort=[(atr, pymongo.ASCENDING)]), self.__collection.find_one(sort=[(atr, pymongo.DESCENDING)])
-
 
     def get_databases(self):
         return [db for db in self.__client.database_names() if db not in ['local', 'admin', 'test']]
 
-
     def get_collections(self):
         return [c for c in self.__db.collection_names() if c not in ['system.indexes']]
-
-
-################################################
-#
-#   MANAGE COLLECTIONS
-#
-################################################
 
     def join_collections(self, source_collection, target_collection=None, source_database=None, target_database=None):
         if target_collection is None:
@@ -132,27 +113,16 @@ class MongoFrontEnd:
             tid = tweet['id']
             dst = self.find({'id':tid})
             if dst.count() == 0:
-                #print ('.', end="")
                 cnt += 1
-                if False:
-                    print (type(tweet))
-                    print (tid)
-                    print (tweet['_id'])
-                    print (dst.count())
-                    print ()
-
                 #not exists this 'id' in the target collection
                 self.save_json(tweet)
             if dst.count() == 1:
-                #print ('.', end="")
                 cnt += 1
-
                 #updating this 'id' in the target collection
                 target_coll.remove({'id':tid})
                 self.save_json(tweet)
             scr_coll.remove({'id':tid})
         return cnt
-        #self.change_collection()
 
     def drop_collection(self, collection):
         self.__db.drop_collection(collection)

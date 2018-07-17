@@ -25,7 +25,7 @@ class InstagramMonitor(object):
             password (str): The password of the Instagram username.
             host (str): Address where MongoDB is listening.
             port (int): Port where MongoDB is listening.
-            post_db (str): Name of database storing Instagram posts
+            post_db (str): Name of database storing Instagram posts.
             comments_db (str): Name of database storing Instagram comments.
             update_days (int): Amount of days old a post must be, to not try
                 to search for new comments.

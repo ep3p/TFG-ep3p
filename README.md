@@ -18,7 +18,7 @@ $ python -m instagram_monitor
 Options
 -------
 ```
-  -h, --help                  show this help message and exit
+  --help, -h                  Show this help message and exit
   --queries QUERIES           Path to a file containing users and hashtags to scrape (default: queries.txt)
   --login_user LOGIN_USER     Instagram login user (default: None)
   --login_pass LOGIN_PASS     Instagram login password (default: None)
